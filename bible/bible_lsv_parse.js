@@ -20,12 +20,13 @@ import console_log from '../foundation/console_log.js';
 import list_where from '../foundation/list_where.js';
 import is_empty from '../core/is_empty.js';
 import is_string from '../foundation/is_string.js';
+import bible_file_get_http from './bible_file_get_http.js';
 export default bible_lsv_parse;
-async function bible_lsv_parse(data, cache, http_data) {
+async function bible_lsv_parse(data, cache, lsv_txt) {
   arguments_assert(arguments, is_defined, is_defined, is_string);
-  let lines = string_split(http_data, '\n');
+  let lines = string_split(lsv_txt, '\n');
   let result = [];
-  let testaments_books = await bible_testaments_books(data, cache);
+  let testaments_books = await bible_testaments_books(bible_file_get_http(cache, data));
   let found_book_ids = [];
   for_each(lines, line => {
     let trimmed = string_trim(line, '\r');

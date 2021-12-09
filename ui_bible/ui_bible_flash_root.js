@@ -36,8 +36,9 @@ async function ui_bible_flash_root(parent, bible) {
       ui_spacer(verse_current);
       let element_token = html_element(verse_current, 'span');
       if (list_includes([
-          'God',
+          'YHWH',
           'LORD',
+          'God',
           'Jesus',
           'Love',
           'love'
