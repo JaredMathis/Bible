@@ -27,7 +27,7 @@ async function ui_bible_root(parent) {
   let data = {};
   let cache = {};
   ui_loader_initialize(parent, data);
-  let bible = [];
+  let bible;
   function set_font_size(element) {
     arguments_assert(arguments, is_html_element);
     if (false)
@@ -57,15 +57,7 @@ async function ui_bible_root(parent) {
     set_font_size(button);
     button.addEventListener('click', async e => {
       await ui_load(data, ui_delay(async () => {
-        await bible_load(bible_id, cache, data);
-        let books = await bible_books(bible_id, data, cache);
-        await for_each_async(books, async book => {
-          let chapters = await bible_book_chapters(bible_id, data, cache, book);
-          await for_each_async(chapters, async chapter_index => {
-            let chapter = await bible_chapter(bible_id, data, cache, book, chapter_index);
-            list_add_all(bible, chapter);
-          });
-        });
+        bible = await bible_load(bible_id, cache, data);
       }));
       ui_hide(screen_home);
       ui_show(screen_app_choose);
