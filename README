@@ -1,2 +1,3 @@
 To deploy to firebase:
     node bible/bible_deploy.js 
+    
