@@ -20,6 +20,7 @@ import console_log from '../foundation/console_log.js';
 import list_where from '../foundation/list_where.js';
 import is_empty from '../core/is_empty.js';
 import bible_lsv_parse from './bible_lsv_parse.js';
+import bible_file_get_http from './bible_file_get_http.js';
 export default bible_load_lsv;
 async function bible_load_lsv(cache, data) {
   arguments_assert(arguments, is_defined, is_defined);
@@ -29,7 +30,8 @@ async function bible_load_lsv(cache, data) {
     return cache[url];
   }
   let http_data = await ui_http_cached_data(cache)(data, url);
-  let result = bible_lsv_parse(data, cache, http_data)
+  const file_get = bible_file_get_http(cache, data);
+  let result = bible_lsv_parse(file_get, http_data)
   cache[url] = result;
   return result;
 }
