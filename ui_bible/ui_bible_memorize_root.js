@@ -69,6 +69,7 @@ import string_trim_all from '../core/string_trim_all.js';
 import string_join from '../foundation/string_join.js';
 import bible_interlinear_url from '../bible/bible_interlinear_url.js';
 import is_list from '../foundation/is_list.js';
+import html_button from '../ui/html_button.js';
 export default ui_bible_root;
 async function ui_bible_root(parent, data, bible) {
   arguments_assert(arguments, is_html_element, is_defined, is_list);
@@ -256,11 +257,25 @@ async function ui_bible_root(parent, data, bible) {
     ui_data_change(data, 'book_interlinear', book_interlinear);
   });
   ui_data_on_changed(data, 'chapter', value => {
+    if (value === null) {
+      return;
+    }
     document.title = document_title + ' ' + ui_data_value(data, 'book') + ' ' + value;
     ui_data_change(data, 'screen', screen_memorize);
     const book = ui_data_value(data, 'book');
     const chapter = ui_data_value(data, 'chapter');
-    title.textContent = book + " " + chapter + " (Type the first letter of the next word; Press enter to toggle viewing all the words)";
+    title.replaceChildren();
+    let button_book = html_button(title, data, book, 'primary');
+    button_book.addEventListener('click', e => {
+      ui_data_change(data, 'chapter', null)
+      ui_data_change(data, 'screen', screen_choose_book);
+    })
+    let button_chapter = html_button(title, data, chapter, 'primary')
+    button_chapter.addEventListener('click', e => {
+      ui_data_change(data, 'screen', screen_choose_chapter);
+    })
+    let instructions = html_div(title);
+    html_text(instructions, "(Type the first letter of the next word; Press enter to toggle viewing all the words)")
     let chapter_verses = list_where(bible, b => b.book === book && b.chapter === chapter)
     let verses = list_map(chapter_verses, v => v);
     ui_data_change(data, 'index_verse_current', 0);
