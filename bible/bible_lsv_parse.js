@@ -1,14 +1,10 @@
 import arguments_assert from '../foundation/arguments_assert.js';
 import for_each from '../foundation/for_each.js';
-import is_defined from '../foundation/is_defined.js';
-import ui_http_cached_data from '../ui/ui_http_cached_data.js';
-import bible_public_url from './bible_public_url.js';
 import string_split from '../foundation/string_split.js';
 import size from '../foundation/size.js';
 import list_get from '../foundation/list_get.js';
 import list_add from '../foundation/list_add.js';
 import sequence_first from '../core/sequence_first.js';
-import has_property from '../foundation/has_property.js';
 import list_skip from '../core/list_skip.js';
 import bible_verse_data from './bible_verse_data.js';
 import bible_testaments_books from './bible_testaments_books.js';
@@ -16,11 +12,9 @@ import list_includes from '../foundation/list_includes.js';
 import comment from '../core/comment.js';
 import assert from '../foundation/assert.js';
 import string_trim from '../core/string_trim.js';
-import console_log from '../foundation/console_log.js';
 import list_where from '../foundation/list_where.js';
 import is_empty from '../core/is_empty.js';
 import is_string from '../foundation/is_string.js';
-import bible_file_get_http from './bible_file_get_http.js';
 import is_function from '../foundation/is_function.js';
 export default bible_lsv_parse;
 async function bible_lsv_parse(file_get, lsv_txt) {
@@ -32,7 +26,7 @@ async function bible_lsv_parse(file_get, lsv_txt) {
   for_each(lines, line => {
     let trimmed = string_trim(line, '\r');
     let split_space = string_split(trimmed, ' ');
-    let tokens = list_where(split_space, s => !is_empty(s))
+    let tokens = list_where(split_space, s => !is_empty(s));
     if (size(tokens) < 2) {
       return;
     }

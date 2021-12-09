@@ -1,6 +1,5 @@
 import arguments_assert from '../foundation/arguments_assert.js';
 import assert from '../foundation/assert.js';
-import error from '../foundation/error.js';
 import for_each from '../foundation/for_each.js';
 import is_string_not_empty from '../foundation/is_string_not_empty.js';
 import list_includes from '../foundation/list_includes.js';
@@ -28,13 +27,13 @@ function ui_bible_tokenize_hyphens(s) {
   for_each(hyphens, hyphen => {
     let indices_hyphen = string_index_of_all(s, hyphen);
     list_add_all(indices_hyphens, indices_hyphen);
-  })
+  });
   let index_last = size(s);
   let indices_split = [number_zero()];
   let filtered = list_where(indices_hyphens, hi => !list_includes(indices_hyphens, number_add_one(hi)));
   let mapped = list_map(filtered, number_add_one);
-  list_add_all(indices_split, mapped)
-  assert(!list_includes(mapped, number_zero()))
+  list_add_all(indices_split, mapped);
+  assert(!list_includes(mapped, number_zero()));
   if (!list_includes(indices_split, index_last)) {
     list_add(indices_split, index_last);
   }
@@ -44,13 +43,26 @@ function ui_bible_tokenize_hyphens(s) {
     let left = list_get(pair, 0);
     let right = list_get(pair, 1);
     let token = string_substring(s, left, right);
-    list_add(result, token)
-  })
+    list_add(result, token);
+  });
   return result;
 }
-throws(ui_bible_tokenize_hyphens)('')
-returns(ui_bible_tokenize_hyphens, ['a']) ('a')
-returns(ui_bible_tokenize_hyphens, [`a${h0}`,'b']) (`a${h0}b`)
-returns(ui_bible_tokenize_hyphens, [`a${h0}${h0}${h0}`,'b']) (`a${h0}${h0}${h0}b`)
-returns(ui_bible_tokenize_hyphens, [`a${h0}${h0}`,'b']) (`a${h0}${h0}b`)
-returns(ui_bible_tokenize_hyphens, [`a${h0}${h0}${h0}`,`b${h0}${h0}`,'c'])(`a${h0}${h0}${h0}b${h0}${h0}c`)
+throws(ui_bible_tokenize_hyphens)('');
+returns(ui_bible_tokenize_hyphens, ['a'])('a');
+returns(ui_bible_tokenize_hyphens, [
+  `a${ h0 }`,
+  'b'
+])(`a${ h0 }b`);
+returns(ui_bible_tokenize_hyphens, [
+  `a${ h0 }${ h0 }${ h0 }`,
+  'b'
+])(`a${ h0 }${ h0 }${ h0 }b`);
+returns(ui_bible_tokenize_hyphens, [
+  `a${ h0 }${ h0 }`,
+  'b'
+])(`a${ h0 }${ h0 }b`);
+returns(ui_bible_tokenize_hyphens, [
+  `a${ h0 }${ h0 }${ h0 }`,
+  `b${ h0 }${ h0 }`,
+  'c'
+])(`a${ h0 }${ h0 }${ h0 }b${ h0 }${ h0 }c`);

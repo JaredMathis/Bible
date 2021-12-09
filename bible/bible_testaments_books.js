@@ -2,7 +2,6 @@ import list_add_all from '../core/list_add_all.js';
 import arguments_assert from '../foundation/arguments_assert.js';
 import bible_testament_old_books from './bible_testament_old_books.js';
 import bible_testament_new_books from './bible_testament_new_books.js';
-import is_defined from '../foundation/is_defined.js';
 import for_each from '../foundation/for_each.js';
 import is_function from '../foundation/is_function.js';
 export default bible_testaments_books;
