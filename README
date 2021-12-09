@@ -1,3 +1,6 @@
+Live site:
+    https://wlj-bible.web.app/
+
 To deploy to firebase:
     node bible/bible_deploy.js 
-    
+
