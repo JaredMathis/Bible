@@ -1,4 +1,4 @@
-import initialize_property_if_not_exists from '../core/initialize_property_if_not_exists.js'
+import string_to_uppercase from '../core/string_to_uppercase.js'
 import arguments_assert from '../foundation/arguments_assert.js';
 import error from '../foundation/error.js';
 import html_link from '../ui/html_link.js';
@@ -70,6 +70,8 @@ import string_join from '../foundation/string_join.js';
 import bible_interlinear_url from '../bible/bible_interlinear_url.js';
 import is_list from '../foundation/is_list.js';
 import html_button from '../ui/html_button.js';
+import ui_hide from '../ui/ui_hide.js';
+import bible_hyphens_get from '../bible/bible_hyphens_get.js';
 export default ui_bible_root;
 async function ui_bible_root(parent, data, bible) {
   arguments_assert(arguments, is_html_element, is_defined, is_list);
@@ -164,8 +166,8 @@ async function ui_bible_root(parent, data, bible) {
     })
     let token_previous;
     for_each(tokens, token_current => {
-      let hyphen = '—'
-      let no_spacer = is_defined(token_previous) && string_ends_with(token_previous, hyphen);
+      let hyphens = bible_hyphens_get();
+      let no_spacer = is_defined(token_previous) && list_any(hyphens, hyphen => string_ends_with(token_previous, hyphen));
       if (!no_spacer) {
         let element_spacer = ui_spacer(left);
         element_spacer.dataset.is_token = false;
@@ -189,6 +191,10 @@ async function ui_bible_root(parent, data, bible) {
       return;
     }
     let actual = e.key
+    press_key(actual)
+  })
+  function press_key(actual) {
+    arguments_assert(actual, is_defined)
     if (equals(actual, 'Enter')) {
       ui_data_change(data, 'show_all_verses', boolean_not(ui_data_value(data, 'show_all_verses')))
       ui_bible_update(data, container_verses)
@@ -217,12 +223,13 @@ async function ui_bible_root(parent, data, bible) {
     let joined = string_join(filtered, '');
     let first = sequence_first(joined);
     let expected = string_to_lowercase(first);
-    console.log({expected, actual})
     if (equals(actual, expected)) {
       html_classes_remove(element_token, ['text-white']);
       const index_token_current_new = number_add_one(index_token_current);
       ui_data_change(data, 'index_token_current', index_token_current_new);
-      if (index_token_current_new === size(tokens)) {
+      const tokens_size = size(tokens);
+      console_log({actual,tokens_size,tokens})
+      if (index_token_current_new === tokens_size) {
         console.log('next verse')
         const index_verse_current_new = number_add_one(index_verse_current);
         ui_data_change(data, 'index_verse_current', index_verse_current_new);
@@ -239,7 +246,7 @@ async function ui_bible_root(parent, data, bible) {
       }
     }
     ui_bible_update(data, container_verses)
-  })
+  }
   ui_data_on_changed(data, 'index_verse_current', () => {
     ui_data_change(data, 'index_token_current', number_zero());
   })
@@ -301,8 +308,23 @@ async function ui_bible_root(parent, data, bible) {
     if (value === screen_memorize) {
       ui_show(title)
       ui_show(container_verses);
+      
     }
   });
+  let keyboard = html_div(parent);
+  ui_hide(keyboard)
+  html_classes_add(keyboard, ['fixed-bottom']);
+  let letters = 'qwertyuiopasdfghjklzxcvbnm';
+  let letters_list = string_split(letters, '');
+  letters_list.sort();
+  for_each(letters_list, letter => {
+    let uppercase = string_to_uppercase(letter);
+    let key = html_button(keyboard, data, uppercase, 'primary');
+    key.addEventListener('click', e => {
+      press_key(letter);
+    })
+  })
+
   ui_data_change(data, 'pattern', [true])
   ui_data_change(data, 'screen', screen_choose_book)
 }

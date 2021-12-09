@@ -15,6 +15,10 @@ import bible_testaments_books from './bible_testaments_books.js';
 import list_includes from '../foundation/list_includes.js';
 import comment from '../core/comment.js';
 import assert from '../foundation/assert.js';
+import string_trim from '../core/string_trim.js';
+import console_log from '../foundation/console_log.js';
+import list_where from '../foundation/list_where.js';
+import is_empty from '../core/is_empty.js';
 export default bible_load_lsv;
 async function bible_load_lsv(cache, data) {
   arguments_assert(arguments, is_defined, is_defined);
@@ -29,7 +33,9 @@ async function bible_load_lsv(cache, data) {
   let testaments_books = await bible_testaments_books(data, cache);
   let found_book_ids = [];
   for_each(lines, line => {
-    let tokens = string_split(line, ' ');
+    let trimmed = string_trim(line, '\r');
+    let split_space = string_split(trimmed, ' ');
+    let tokens = list_where(split_space, s => !is_empty(s))
     if (size(tokens) < 2) {
       return;
     }
@@ -43,11 +49,11 @@ async function bible_load_lsv(cache, data) {
     }
     let book_index = size(found_book_ids) - 1;
     let book = list_get(testaments_books, book_index);
-    let split = string_split(second, ':');
+    let split_colon = string_split(second, ':');
     comment('it should be a chapter followed by a verse like 1:23, hence size 2');
-    assert(size(split) === 2);
-    let chapter_index = sequence_first(split);
-    let verse = list_get(split, 1);
+    assert(size(split_colon) === 2);
+    let chapter_index = sequence_first(split_colon);
+    let verse = list_get(split_colon, 1);
     let remaining = list_skip(tokens, 2);
     let verse_data = bible_verse_data(book, chapter_index, verse, remaining);
     list_add(result, verse_data);

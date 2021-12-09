@@ -17,14 +17,21 @@ import size from '../foundation/size.js';
 import list_to_pairs from '../foundation/list_to_pairs.js';
 import string_substring from '../foundation/string_substring.js';
 import list_where from '../foundation/list_where.js';
+import bible_hyphens_get from '../bible/bible_hyphens_get.js';
+import sequence_first from '../core/sequence_first.js';
 export default ui_bible_tokenize_hyphens;
-let hyphen = '—';
+let hyphens = bible_hyphens_get();
+let h0 = sequence_first(hyphens);
 function ui_bible_tokenize_hyphens(s) {
   arguments_assert(arguments, is_string_not_empty);
-  let indices_hyphen = string_index_of_all(s, hyphen);
+  let indices_hyphens = [];
+  for_each(hyphens, hyphen => {
+    let indices_hyphen = string_index_of_all(s, hyphen);
+    list_add_all(indices_hyphens, indices_hyphen);
+  })
   let index_last = size(s);
   let indices_split = [number_zero()];
-  let filtered = list_where(indices_hyphen, hi => !list_includes(indices_hyphen, number_add_one(hi)));
+  let filtered = list_where(indices_hyphens, hi => !list_includes(indices_hyphens, number_add_one(hi)));
   let mapped = list_map(filtered, number_add_one);
   list_add_all(indices_split, mapped)
   assert(!list_includes(mapped, number_zero()))
@@ -43,7 +50,7 @@ function ui_bible_tokenize_hyphens(s) {
 }
 throws(ui_bible_tokenize_hyphens)('')
 returns(ui_bible_tokenize_hyphens, ['a']) ('a')
-returns(ui_bible_tokenize_hyphens, [`a${hyphen}`,'b']) (`a${hyphen}b`)
-returns(ui_bible_tokenize_hyphens, [`a${hyphen}${hyphen}${hyphen}`,'b']) (`a${hyphen}${hyphen}${hyphen}b`)
-returns(ui_bible_tokenize_hyphens, [`a${hyphen}${hyphen}`,'b']) (`a${hyphen}${hyphen}b`)
-returns(ui_bible_tokenize_hyphens, [`a${hyphen}${hyphen}${hyphen}`,`b${hyphen}${hyphen}`,'c'])(`a${hyphen}${hyphen}${hyphen}b${hyphen}${hyphen}c`)
+returns(ui_bible_tokenize_hyphens, [`a${h0}`,'b']) (`a${h0}b`)
+returns(ui_bible_tokenize_hyphens, [`a${h0}${h0}${h0}`,'b']) (`a${h0}${h0}${h0}b`)
+returns(ui_bible_tokenize_hyphens, [`a${h0}${h0}`,'b']) (`a${h0}${h0}b`)
+returns(ui_bible_tokenize_hyphens, [`a${h0}${h0}${h0}`,`b${h0}${h0}`,'c'])(`a${h0}${h0}${h0}b${h0}${h0}c`)
