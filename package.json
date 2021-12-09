@@ -1,0 +1,22 @@
+{
+  "name": "bible",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sandbox.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaredMathis/MemorizeBible.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/JaredMathis/MemorizeBible/issues"
+  },
+  "homepage": "https://github.com/JaredMathis/MemorizeBible#readme",
+  "dependencies": {
+    "redaxios": "^0.4.1"
+  }
+}
