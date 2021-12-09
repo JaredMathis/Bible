@@ -120,14 +120,14 @@ async function ui_bible_root(parent, data, bible) {
       let languages_keys = keys(languages);
       assert(list_any(languages_keys, k => string_starts_with(number, k)), { number });
       let trimmed = string_trim_all(number, languages_keys);
-      let english_span = html_element(right, 'span');
-      html_text(english_span, ` (${ english }) `);
       let link = html_link(right);
       html_text(link, `${ non_english }`);
       link.setAttribute('target', '_blank');
       let first = sequence_first(number);
       let language = property_value_get(languages, first);
       link.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
+      let english_span = html_element(right, 'span');
+      html_text(english_span, ` (${ english }) `);
     });
     function html_table(parent, data) {
       let table = html_element(parent, 'table');
