@@ -58,6 +58,7 @@ import is_list from '../foundation/is_list.js';
 import html_button from '../ui/html_button.js';
 import ui_hide from '../ui/ui_hide.js';
 import bible_hyphens_get from '../bible/bible_hyphens_get.js';
+import ui_action_no_message from '../ui/ui_action_no_message.js';
 export default ui_bible_root;
 async function ui_bible_root(parent, data, bible) {
   arguments_assert(arguments, is_html_element, is_defined, is_list);
@@ -142,7 +143,7 @@ async function ui_bible_root(parent, data, bible) {
     }
     verse_number.textContent = verse;
     verse_number.dataset.is_token = false;
-    verse_number.addEventListener('click', e => {
+    ui_action_no_message(data, verse_number, e => {
       ui_data_change(data, 'index_token_current', index);
       ui_data_change(data, 'index_verse_current', index);
       ui_bible_update(data, container_verses);
@@ -276,12 +277,12 @@ async function ui_bible_root(parent, data, bible) {
     const chapter = ui_data_value(data, 'chapter');
     title.replaceChildren();
     let button_book = html_button(title, data, book, 'primary');
-    button_book.addEventListener('click', e => {
+    ui_action_no_message(data, button_book, e => {
       ui_data_change(data, 'chapter', null);
       ui_data_change(data, 'screen', screen_choose_book);
     });
     let button_chapter = html_button(title, data, chapter, 'primary');
-    button_chapter.addEventListener('click', e => {
+    ui_action_no_message(data, button_chapter, e => {
       ui_data_change(data, 'screen', screen_choose_chapter);
     });
     let instructions = html_div(title);
@@ -322,7 +323,7 @@ async function ui_bible_root(parent, data, bible) {
   for_each(letters_list, letter => {
     let uppercase = string_to_uppercase(letter);
     let key = html_button(keyboard, data, uppercase, 'primary');
-    key.addEventListener('click', e => {
+    ui_action_no_message(data, key, e => {
       press_key(letter);
     });
   });

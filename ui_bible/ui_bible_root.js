@@ -14,6 +14,7 @@ import is_html_element from '../ui/is_html_element.js';
 import ui_bible_memorize_root from '../ui_bible/ui_bible_memorize_root.js';
 import ui_show from '../ui/ui_show.js';
 import ui_bible_flash_root from './ui_bible_flash_root.js';
+import ui_action_no_message from '../ui/ui_action_no_message.js';
 export default ui_bible_root;
 async function ui_bible_root(parent) {
   let data = {};
@@ -47,7 +48,7 @@ async function ui_bible_root(parent) {
     let button_container = ui_container(buttons);
     let button = html_button(button_container, data, label, 'primary');
     set_font_size(button);
-    button.addEventListener('click', async e => {
+    ui_action_no_message(data, button, async e => {
       await ui_load(data, ui_delay(async () => {
         bible = await bible_load(bible_id, cache, data);
       }));
@@ -58,12 +59,12 @@ async function ui_bible_root(parent) {
   let screen_app_choose = ui_container(parent);
   ui_hide(screen_app_choose);
   let button_memorize = html_button(screen_app_choose, data, 'Memorize', 'primary');
-  button_memorize.addEventListener('click', e => {
+  ui_action_no_message(data, button_memorize, e => {
     ui_hide(screen_app_choose);
     ui_bible_memorize_root(parent, data, bible);
   });
   let button_flash = html_button(screen_app_choose, data, 'Flash', 'primary');
-  button_flash.addEventListener('click', e => {
+  ui_action_no_message(data, button_flash, e => {
     ui_hide(screen_app_choose);
     ui_bible_flash_root(parent, bible);
   });
