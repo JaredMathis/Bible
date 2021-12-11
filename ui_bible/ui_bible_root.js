@@ -62,10 +62,15 @@ async function ui_bible_root(parent) {
   });
   let screen_app_choose = ui_container(container);
   ui_hide(screen_app_choose);
+  let button_read = html_button(screen_app_choose, data, 'Read', 'primary');
+  ui_action_no_message(data, button_read, e => {
+    ui_hide(screen_app_choose);
+    ui_bible_memorize_root(container, data, bible, 'read');
+  });
   let button_memorize = html_button(screen_app_choose, data, 'Memorize', 'primary');
   ui_action_no_message(data, button_memorize, e => {
     ui_hide(screen_app_choose);
-    ui_bible_memorize_root(container, data, bible);
+    ui_bible_memorize_root(container, data, bible, 'memorize');
   });
   let button_flash = html_button(screen_app_choose, data, 'Flash', 'primary');
   ui_action_no_message(data, button_flash, e => {

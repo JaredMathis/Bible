@@ -17,8 +17,11 @@ import boolean from '../foundation/boolean.js';
 import comment from '../core/comment.js';
 import ui_list_item_to_element_verse from './ui_list_item_to_element_verse.js';
 export default ui_bible_update;
-function ui_bible_update(data, container_verses) {
-  arguments_assert(arguments, is_defined, is_defined);
+function ui_bible_update(data, container_verses, memorize) {
+  arguments_assert(arguments, is_defined, is_defined, is_boolean);
+  if (!memorize) {
+    return;
+  }
   let pattern = ui_data_value(data, 'pattern');
   assert(is_list_of(is_boolean)(pattern));
   if (is_empty(pattern)) {
@@ -49,7 +52,7 @@ function ui_bible_update(data, container_verses) {
       const is_before_current_verse = number_less_than(index_verse, index_verse_current);
       let is_before_current = is_current_verse_but_before_token || is_before_current_verse;
       let is_current_verse_and_token = is_current_verse && equals(index_token, index_token_current);
-      let show = pattern[counter % size(pattern)];
+      let pattern_show = pattern[counter % size(pattern)];
       html_classes_remove(element_token, [
         'text-white',
         'bg-primary',
@@ -63,12 +66,12 @@ function ui_bible_update(data, container_verses) {
           'bg-primary',
           'text-primary'
         ]);
-        if (boolean(show) || show_all_verses) {
+        if (boolean(pattern_show) || show_all_verses) {
           html_classes_add(element_token, ['text-white']);
         }
       } else {
         if (!is_before_current) {
-          if (boolean(show) || show_all_verses) {
+          if (boolean(pattern_show) || show_all_verses) {
             html_classes_add(element_token, ['text-muted']);
           } else {
             html_classes_add(element_token, ['text-white']);

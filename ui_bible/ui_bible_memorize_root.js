@@ -60,9 +60,10 @@ import ui_hide from '../ui/ui_hide.js';
 import bible_hyphens_get from '../bible/bible_hyphens_get.js';
 import ui_action_no_message from '../ui/ui_action_no_message.js';
 import ui_container from '../ui/ui_container.js';
-export default ui_bible_root;
-async function ui_bible_root(parent, data, bible) {
-  arguments_assert(arguments, is_html_element, is_defined, is_list);
+export default ui_bible_memorize_root;
+async function ui_bible_memorize_root(parent, data, bible, mode) {
+  arguments_assert(arguments, is_html_element, is_defined, is_list, is_string_not_empty);
+  let memorize = mode === 'memorize';
   let screen_choose_chapter = 'choose_chapter';
   let screen_choose_book = 'choose_book';
   let screen_memorize = 'memorize';
@@ -72,7 +73,10 @@ async function ui_bible_root(parent, data, bible) {
   let books = list_property_unique(bible, 'book');
   let container = ui_container(parent);
   let title = html_div(container);
-  let {input: pattern_input} = ui_labelled_input(container, 'Pattern');
+  let {input: pattern_input, container: container_pattern} = ui_labelled_input(container, 'Pattern');
+  if (!memorize) {
+    ui_hide(container_pattern);
+  } 
   pattern_input.addEventListener('input', function (e) {
     const value = property_value_get(property_value_get(e, 'target'), 'value');
     let characters = string_split(value, '');
@@ -106,6 +110,9 @@ async function ui_bible_root(parent, data, bible) {
     html_classes_add(left, ['col']);
     let right = html_element(row, 'div');
     html_classes_add(right, ['col']);
+    if (memorize) {
+      ui_hide(right);
+    }
     let verse_number = html_link(left);
     verse_number.setAttribute('role', 'button');
     const verse = property_value_get(bible_verse, 'verse');
@@ -145,11 +152,13 @@ async function ui_bible_root(parent, data, bible) {
     }
     verse_number.textContent = verse;
     verse_number.dataset.is_token = false;
-    ui_action_no_message(data, verse_number, e => {
-      ui_data_change(data, 'index_token_current', index);
-      ui_data_change(data, 'index_verse_current', index);
-      ui_bible_update(data, container_verses);
-    });
+    if (memorize) {
+      ui_action_no_message(data, verse_number, e => {
+        ui_data_change(data, 'index_token_current', index);
+        ui_data_change(data, 'index_verse_current', index);
+        ui_bible_update(data, container_verses, memorize);
+      });
+    }
     let split = property_value_get(bible_verse, 'tokens');
     let tokens = [];
     for_each(split, s => {
@@ -171,10 +180,10 @@ async function ui_bible_root(parent, data, bible) {
     });
   });
   ui_data_on_changed(data, 'pattern', () => {
-    ui_bible_update(data, container_verses);
+    ui_bible_update(data, container_verses, memorize);
   });
   ui_data_on_changed(data, 'verses', v => {
-    ui_bible_update(data, container_verses);
+    ui_bible_update(data, container_verses, memorize);
   });
   ui_data_change(data, 'show_all_verses', false);
   window.addEventListener('keydown', e => {
@@ -186,9 +195,12 @@ async function ui_bible_root(parent, data, bible) {
   });
   function press_key(actual) {
     arguments_assert(arguments, is_defined);
+    if (!memorize) {
+      return;
+    }
     if (equals(actual, 'Enter')) {
       ui_data_change(data, 'show_all_verses', boolean_not(ui_data_value(data, 'show_all_verses')));
-      ui_bible_update(data, container_verses);
+      ui_bible_update(data, container_verses, memorize)
     }
     if (!is_character(actual)) {
       return;
@@ -240,7 +252,7 @@ async function ui_bible_root(parent, data, bible) {
         }
       }
     }
-    ui_bible_update(data, container_verses);
+    ui_bible_update(data, container_verses, memorize);
   }
   ui_data_on_changed(data, 'index_verse_current', () => {
     ui_data_change(data, 'index_token_current', number_zero());
@@ -289,6 +301,10 @@ async function ui_bible_root(parent, data, bible) {
     });
     let instructions = html_div(title);
     html_text(instructions, '(Type the first letter of the next word; Press enter to toggle viewing all the words)');
+    if (!memorize) 
+    {
+      ui_hide(instructions)
+    }
     let chapter_verses = list_where(bible, b => b.book === book && b.chapter === chapter);
     let verses = list_map(chapter_verses, v => v);
     ui_data_change(data, 'index_verse_current', 0);
@@ -316,22 +332,25 @@ async function ui_bible_root(parent, data, bible) {
       ui_show(container_verses);
     }
   });
-  let keyboard = html_div(parent);
-  html_classes_add(keyboard, ['fixed-bottom']);
-  let letters = 'qwertyuiopasdfghjklzxcvbnm';
-  let letters_list = string_split(letters, '');
-  letters_list.sort();
-  for_each(letters_list, letter => {
-    let uppercase = string_to_uppercase(letter);
-    let key = html_button(keyboard, data, uppercase, 'primary');
-    ui_action_no_message(data, key, e => {
-      press_key(letter);
+  if (memorize) {
+    let keyboard = html_div(parent);
+    html_classes_add(keyboard, ['fixed-bottom']);
+    let letters = 'qwertyuiopasdfghjklzxcvbnm';
+    let letters_list = string_split(letters, '');
+    letters_list.sort();
+    for_each(letters_list, letter => {
+      let uppercase = string_to_uppercase(letter);
+      let key = html_button(keyboard, data, uppercase, 'primary');
+      html_classes_add(key, ['btn-sm'])
+      ui_action_no_message(data, key, e => {
+        press_key(letter);
+      });
     });
-  });
-  let window_height = window.innerHeight;
-  let keyboard_height = keyboard.offsetHeight;
-  container.style['max-height'] = window_height - keyboard_height
-  html_classes_add(container, ['overflow-auto'])
+    let window_height = window.innerHeight;
+    let keyboard_height = keyboard.offsetHeight;
+    container.style['max-height'] = window_height - keyboard_height
+    html_classes_add(container, ['overflow-auto'])
+  }
   ui_data_change(data, 'pattern', [true]);
   ui_data_change(data, 'screen', screen_choose_book);
 }
