@@ -335,16 +335,22 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   if (memorize) {
     let keyboard = html_div(parent);
     html_classes_add(keyboard, ['fixed-bottom']);
-    let letters = 'qwertyuiopasdfghjklzxcvbnm';
-    let letters_list = string_split(letters, '');
-    letters_list.sort();
-    for_each(letters_list, letter => {
-      let uppercase = string_to_uppercase(letter);
-      let key = html_button(keyboard, data, uppercase, 'primary');
-      html_classes_add(key, ['btn-sm'])
-      ui_action_no_message(data, key, e => {
-        press_key(letter);
-      });
+    let rows = [
+      'qwertyuiop',
+      'asdfghjkl',
+      'zxcvbnm',
+    ]
+    for_each(rows, row => {
+      let keyboard_row = html_element(keyboard, 'center');
+      let letters_list = string_split(row, '');
+      for_each(letters_list, letter => {
+        let uppercase = string_to_uppercase(letter);
+        let key = html_button(keyboard_row, data, uppercase, 'primary');
+        html_classes_add(key, ['btn-sm'])
+        ui_action_no_message(data, key, e => {
+          press_key(letter);
+        });
+      })
     });
     let window_height = window.innerHeight;
     let keyboard_height = keyboard.offsetHeight;
