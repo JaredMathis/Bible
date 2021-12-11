@@ -19,20 +19,20 @@ async function bible_kjv_parse(file_get, books) {
   let testaments_books = await bible_testaments_books(file_get);
   let result = [];
   for_each(testaments_books, testaments_book => {
-    let book = list_where_single(books, b => { 
+    let book = list_where_single(books, b => {
       return property_value_get(b, 'book') === testaments_book;
     });
     for_each(book.chapters, chapter => {
       let chapter_index = chapter.chapter;
-      for_each(chapter.verses, verse=> {
+      for_each(chapter.verses, verse => {
         let verse_index = verse.verse;
         let text = verse.text;
         const unfiltered = text.split(' ');
         let tokens = list_where(unfiltered, t => !is_empty(t));
-        let verse_data = bible_verse_data(testaments_book, chapter_index, verse_index, tokens)
+        let verse_data = bible_verse_data(testaments_book, chapter_index, verse_index, tokens);
         list_add(result, verse_data);
-      })
-    })
+      });
+    });
   });
   return result;
 }
