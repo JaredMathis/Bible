@@ -15,30 +15,34 @@ import ui_bible_memorize_root from '../ui_bible/ui_bible_memorize_root.js';
 import ui_show from '../ui/ui_show.js';
 import ui_bible_flash_root from './ui_bible_flash_root.js';
 import ui_action_no_message from '../ui/ui_action_no_message.js';
+import ui_initialize from '../ui/ui_initialize.js';
+import ui_alert_message_to_html from '../ui/ui_alert_message_to_html.js';
 export default ui_bible_root;
 async function ui_bible_root(parent) {
-  let data = {};
   let cache = {};
-  ui_loader_initialize(parent, data);
+  let {data, container} = ui_initialize(parent, ui_alert_message_to_html)
   let bible;
   function set_font_size(element) {
     arguments_assert(arguments, is_html_element);
     if (false)
       element.style['font-size'] = '100%';
   }
-  let screen_home = ui_container(parent);
+  let screen_home = ui_container(container);
   let message = html_div(screen_home);
   set_font_size(message);
   html_text(message, 'Choose a Bible version:');
-  let lsv = {
-    label: 'Literal Standard Version (LSV) by Covenant Press',
-    bible_id: 'lsv'
-  };
   let choices = [
-    lsv,
     {
       label: 'American Standard Version',
       bible_id: 'asv'
+    },
+    {
+      label: 'King James Version',
+      bible_id: 'kjv'
+    },
+    {
+      label: 'Literal Standard Version (LSV) by Covenant Press',
+      bible_id: 'lsv'
     }
   ];
   let buttons = ui_container(screen_home);
@@ -56,16 +60,16 @@ async function ui_bible_root(parent) {
       ui_show(screen_app_choose);
     });
   });
-  let screen_app_choose = ui_container(parent);
+  let screen_app_choose = ui_container(container);
   ui_hide(screen_app_choose);
   let button_memorize = html_button(screen_app_choose, data, 'Memorize', 'primary');
   ui_action_no_message(data, button_memorize, e => {
     ui_hide(screen_app_choose);
-    ui_bible_memorize_root(parent, data, bible);
+    ui_bible_memorize_root(container, data, bible);
   });
   let button_flash = html_button(screen_app_choose, data, 'Flash', 'primary');
   ui_action_no_message(data, button_flash, e => {
     ui_hide(screen_app_choose);
-    ui_bible_flash_root(parent, bible);
+    ui_bible_flash_root(container, bible);
   });
 }
