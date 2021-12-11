@@ -183,7 +183,7 @@ async function ui_bible_root(parent, data, bible) {
     press_key(actual);
   });
   function press_key(actual) {
-    arguments_assert(actual, is_defined);
+    arguments_assert(arguments, is_defined);
     if (equals(actual, 'Enter')) {
       ui_data_change(data, 'show_all_verses', boolean_not(ui_data_value(data, 'show_all_verses')));
       ui_bible_update(data, container_verses);
