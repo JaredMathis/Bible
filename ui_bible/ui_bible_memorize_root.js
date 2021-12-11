@@ -59,6 +59,7 @@ import html_button from '../ui/html_button.js';
 import ui_hide from '../ui/ui_hide.js';
 import bible_hyphens_get from '../bible/bible_hyphens_get.js';
 import ui_action_no_message from '../ui/ui_action_no_message.js';
+import ui_container from '../ui/ui_container.js';
 export default ui_bible_root;
 async function ui_bible_root(parent, data, bible) {
   arguments_assert(arguments, is_html_element, is_defined, is_list);
@@ -69,8 +70,9 @@ async function ui_bible_root(parent, data, bible) {
   document.title = document_title;
   const interlinear_books = await ui_http_data(data, `${ bible_interlinear_url() }books.json`);
   let books = list_property_unique(bible, 'book');
-  let title = html_div(parent);
-  let {input: pattern_input} = ui_labelled_input(parent, 'Pattern');
+  let container = ui_container(parent);
+  let title = html_div(container);
+  let {input: pattern_input} = ui_labelled_input(container, 'Pattern');
   pattern_input.addEventListener('input', function (e) {
     const value = property_value_get(property_value_get(e, 'target'), 'value');
     let characters = string_split(value, '');
@@ -95,7 +97,7 @@ async function ui_bible_root(parent, data, bible) {
     let result = list_index_of(book_verses, bible_verse);
     return result;
   }
-  let container_verses = ui_list(parent, data, 'verses', (list_item, bible_verse, index) => {
+  let container_verses = ui_list(container, data, 'verses', (list_item, bible_verse, index) => {
     let book_interlinear = ui_data_value(data, 'book_interlinear');
     console_log({ book_interlinear });
     let row = html_element(list_item, 'div');
@@ -246,11 +248,11 @@ async function ui_bible_root(parent, data, bible) {
   let {
     container: container_books,
     input: input_books
-  } = ui_list_action_string(parent, data, 'books', 'book', 'Choose a book of the Bible');
+  } = ui_list_action_string(container, data, 'books', 'book', 'Choose a book of the Bible');
   let {
     container: container_chapters,
     input: input_chapters
-  } = ui_list_action_string(parent, data, 'chapters', 'chapter', 'Choose a chapter');
+  } = ui_list_action_string(container, data, 'chapters', 'chapter', 'Choose a chapter');
   let elements = [
     container_verses,
     title,
@@ -315,7 +317,6 @@ async function ui_bible_root(parent, data, bible) {
     }
   });
   let keyboard = html_div(parent);
-  ui_hide(keyboard);
   html_classes_add(keyboard, ['fixed-bottom']);
   let letters = 'qwertyuiopasdfghjklzxcvbnm';
   let letters_list = string_split(letters, '');
@@ -327,6 +328,10 @@ async function ui_bible_root(parent, data, bible) {
       press_key(letter);
     });
   });
+  let window_height = window.innerHeight;
+  let keyboard_height = keyboard.offsetHeight;
+  container.style['max-height'] = window_height - keyboard_height
+  html_classes_add(container, ['overflow-auto'])
   ui_data_change(data, 'pattern', [true]);
   ui_data_change(data, 'screen', screen_choose_book);
 }
