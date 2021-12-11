@@ -241,18 +241,21 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
         const index_verse_current_new = number_add_one(index_verse_current);
         ui_data_change(data, 'index_verse_current', index_verse_current_new);
         if (index_verse_current_new === size(ui_data_value(data, 'verses'))) {
-          console.log('next chapter');
-          let next_chapter_success = ui_bible_next_choice(data, 'chapters', 'chapter');
-          if (!boolean(next_chapter_success)) {
-            console.log('next book');
-            ui_bible_next_choice(data, 'books', 'book');
-            let chapters_next = ui_data_value(data, 'chapters');
-            ui_data_change(data, 'chapter', list_get(chapters_next, 0));
-          }
+          next_chapter();
         }
       }
     }
     ui_bible_update(data, container_verses, memorize);
+  }
+  function next_chapter() {
+    console.log('next chapter');
+    let next_chapter_success = ui_bible_next_choice(data, 'chapters', 'chapter');
+    if (!boolean(next_chapter_success)) {
+      console.log('next book');
+      ui_bible_next_choice(data, 'books', 'book');
+      let chapters_next = ui_data_value(data, 'chapters');
+      ui_data_change(data, 'chapter', list_get(chapters_next, 0));
+    }
   }
   ui_data_on_changed(data, 'index_verse_current', () => {
     ui_data_change(data, 'index_token_current', number_zero());
@@ -311,6 +314,50 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     ui_data_change(data, 'index_token_current', 0);
     ui_data_change(data, 'verses', verses);
   });
+  ui_data_on_changed(data, 'screen', screen => {
+    if (screen === screen_memorize && memorize) {
+      ui_show(keyboard);
+    } else {
+      ui_hide(keyboard)
+    }
+  })
+  let button_next_chapter = html_button(parent, data, 'Next Chapter', 'primary');
+  ui_data_on_changed(data, 'screen', screen => {
+    if (screen === screen_memorize && !memorize) {
+      ui_show(button_next_chapter);
+    } else {
+      ui_hide(button_next_chapter)
+    }
+  })
+  ui_action_no_message(data, button_next_chapter, () => {
+    next_chapter();
+    window.scrollTo(0, 0);
+  })
+  let keyboard = html_div(parent);
+  html_classes_add(keyboard, ['fixed-bottom']);
+  let rows = [
+    'qwertyuiop',
+    'asdfghjkl',
+    'zxcvbnm',
+  ]
+  for_each(rows, row => {
+    let keyboard_row = html_element(keyboard, 'center');
+    let letters_list = string_split(row, '');
+    for_each(letters_list, letter => {
+      let uppercase = string_to_uppercase(letter);
+      let key = html_button(keyboard_row, data, uppercase, 'primary');
+      html_classes_add(key, ['btn-sm'])
+      ui_action_no_message(data, key, e => {
+        press_key(letter);
+      });
+    })
+  });
+  let window_height = window.innerHeight;
+  let keyboard_height = keyboard.offsetHeight;
+  if (memorize) {
+    container.style['max-height'] = window_height - keyboard_height
+    html_classes_add(container, ['overflow-auto'])
+  }
   ui_data_on_changed(data, 'screen', value => {
     ui_hide_all(elements);
     if (value === screen_choose_book) {
@@ -332,31 +379,6 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       ui_show(container_verses);
     }
   });
-  if (memorize) {
-    let keyboard = html_div(parent);
-    html_classes_add(keyboard, ['fixed-bottom']);
-    let rows = [
-      'qwertyuiop',
-      'asdfghjkl',
-      'zxcvbnm',
-    ]
-    for_each(rows, row => {
-      let keyboard_row = html_element(keyboard, 'center');
-      let letters_list = string_split(row, '');
-      for_each(letters_list, letter => {
-        let uppercase = string_to_uppercase(letter);
-        let key = html_button(keyboard_row, data, uppercase, 'primary');
-        html_classes_add(key, ['btn-sm'])
-        ui_action_no_message(data, key, e => {
-          press_key(letter);
-        });
-      })
-    });
-    let window_height = window.innerHeight;
-    let keyboard_height = keyboard.offsetHeight;
-    container.style['max-height'] = window_height - keyboard_height
-    html_classes_add(container, ['overflow-auto'])
-  }
   ui_data_change(data, 'pattern', [true]);
   ui_data_change(data, 'screen', screen_choose_book);
 }
