@@ -1,3 +1,4 @@
+import string_replace_all from './../foundation/string_replace_all.js'
 import string_to_uppercase from '../core/string_to_uppercase.js';
 import arguments_assert from '../foundation/arguments_assert.js';
 import error from '../foundation/error.js';
@@ -111,10 +112,15 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     let right = html_element(row, 'div');
     html_classes_add(right, ['col']);
     if (memorize) {
-      ui_hide(right);
+      ui_hide(left);
     }
-    let verse_number = html_link(left);
-    verse_number.setAttribute('role', 'button');
+    let link_verse_number;
+    if (memorize) {
+      link_verse_number = html_link(right);
+      link_verse_number.setAttribute('role', 'button');
+    } else {
+       link_verse_number = html_element(right, 'span');
+    }
     const verse = property_value_get(bible_verse, 'verse');
     let index_interlinear = verse_to_index_interlinear(data, verse);
     let data_interlinear = property_value_get(book_interlinear, index_interlinear);
@@ -130,15 +136,19 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       let languages_keys = keys(languages);
       assert(list_any(languages_keys, k => string_starts_with(number, k)), { number });
       let trimmed = string_trim_all(number, languages_keys);
-      let link = html_link(right);
-      html_text(link, `${ non_english }`);
-      link.setAttribute('target', '_blank');
+      let link_strong_number = html_link(left);
+      html_classes_add(link_strong_number, ['text-decoration-none', 'fw-bold'])
+      html_text(link_strong_number, `${ non_english }`);
+      link_strong_number.setAttribute('target', '_blank');
       let first = sequence_first(number);
       let language = property_value_get(languages, first);
-      link.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
-      let english_span = html_element(right, 'span');
-      html_text(english_span, ` (${ english }) `);
+      link_strong_number.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
+      let english_span = html_element(left, 'span');
+      html_text(english_span, ` [${ english }] `);
+      html_classes_add(english_span, ['text-muted', 'fw-light']);
+      
     });
+
     function html_table(parent, data) {
       let table = html_element(parent, 'table');
       let tbody = html_element(table, 'tbody');
@@ -150,10 +160,11 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
         });
       });
     }
-    verse_number.textContent = verse;
-    verse_number.dataset.is_token = false;
+    html_classes_add(link_verse_number, ['fw-bold']);
+    link_verse_number.textContent = verse + " ";
+    link_verse_number.dataset.is_token = false;
     if (memorize) {
-      ui_action_no_message(data, verse_number, e => {
+      ui_action_no_message(data, link_verse_number, e => {
         ui_data_change(data, 'index_token_current', index);
         ui_data_change(data, 'index_verse_current', index);
         ui_bible_update(data, container_verses, memorize);
@@ -169,15 +180,28 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       let hyphens = bible_hyphens_get();
       let no_spacer = is_defined(token_previous) && list_any(hyphens, hyphen => string_ends_with(token_previous, hyphen));
       if (!no_spacer) {
-        let element_spacer = ui_spacer(left);
+        let element_spacer = ui_spacer(right);
         element_spacer.dataset.is_token = false;
       }
-      let element_token = html_element(left, 'span');
+      let element_token = html_element(right, 'span');
       element_token.textContent = token_current;
       element_token.dataset.token = token_current;
       element_token.dataset.is_token = true;
       token_previous = token_current;
     });
+    let chapter = ui_data_value(data, 'chapter');
+    ui_spacer(right)
+    let right_links = html_div(right);
+    if (memorize) {
+      ui_hide(right_links)
+    }
+    let link_parallel = html_link(right_links);
+    let book = ui_data_value(data, 'book');
+    let book_without_spaces = string_replace_all(book, ' ', '_')
+    let bible_hub_name = string_to_lowercase(book_without_spaces);
+    link_parallel.href = `https://biblehub.com/${bible_hub_name}/${chapter}-${verse}.htm`
+    link_parallel.target = '_blank'
+    html_text(link_parallel, 'Parallel')
   });
   ui_data_on_changed(data, 'pattern', () => {
     ui_bible_update(data, container_verses, memorize);
@@ -288,7 +312,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     if (value === null) {
       return;
     }
-    document.title = document_title + ' ' + ui_data_value(data, 'book') + ' ' + value;
+    document.title = ui_data_value(data, 'book') + ' ' + value+  ': ' + document_title ;
     ui_data_change(data, 'screen', screen_memorize);
     const book = ui_data_value(data, 'book');
     const chapter = ui_data_value(data, 'chapter');

@@ -1,6 +1,8 @@
 Live site:
     https://wlj-bible.web.app/
 
+If the site can be improved in any way, email: jaredmathis at protonmail dot com
+
 To deploy to firebase:
     node bible/bible_deploy.js 
 
