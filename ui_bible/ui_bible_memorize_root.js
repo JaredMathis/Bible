@@ -144,7 +144,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       let language = property_value_get(languages, first);
       link_strong_number.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
       let english_span = html_element(left, 'span');
-      html_text(english_span, ` [${ english }] `);
+      html_text(english_span, `\u00A0[${ english }] `);
       html_classes_add(english_span, ['text-muted', 'fw-light']);
       
     });
