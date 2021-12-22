@@ -1,6 +1,5 @@
 import html_text from '../ui/html_text.js';
 import for_each from '../foundation/for_each.js';
-import ui_loader_initialize from '../ui/ui_loader_initialize.js';
 import ui_hide from '../ui/ui_hide.js';
 import ui_load from '../ui/ui_load.js';
 import ui_delay from '../core/ui_delay.js';
@@ -17,10 +16,12 @@ import ui_bible_flash_root from './ui_bible_flash_root.js';
 import ui_action_no_message from '../ui/ui_action_no_message.js';
 import ui_initialize from '../ui/ui_initialize.js';
 import ui_alert_message_to_html from '../ui/ui_alert_message_to_html.js';
+import ui_div_text from '../ui/ui_div_text.js';
+import html_classes_add from '../ui/html_classes_add.js';
 export default ui_bible_root;
 async function ui_bible_root(parent) {
   let cache = {};
-  let {data, container} = ui_initialize(parent, ui_alert_message_to_html)
+  let {data, container} = ui_initialize(parent, ui_alert_message_to_html);
   let bible;
   function set_font_size(element) {
     arguments_assert(arguments, is_html_element);
@@ -60,6 +61,8 @@ async function ui_bible_root(parent) {
       ui_show(screen_app_choose);
     });
   });
+  let email = ui_div_text(screen_home, 'Email author: jaredmathis @ protonmail dot com')
+  html_classes_add(email, ['small', 'mt-3'])
   let screen_app_choose = ui_container(container);
   ui_hide(screen_app_choose);
   let button_read = html_button(screen_app_choose, data, 'Read', 'primary');

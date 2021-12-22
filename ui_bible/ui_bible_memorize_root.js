@@ -1,4 +1,4 @@
-import string_replace_all from './../foundation/string_replace_all.js'
+import string_replace_all from './../foundation/string_replace_all.js';
 import string_to_uppercase from '../core/string_to_uppercase.js';
 import arguments_assert from '../foundation/arguments_assert.js';
 import error from '../foundation/error.js';
@@ -74,10 +74,13 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   let books = list_property_unique(bible, 'book');
   let container = ui_container(parent);
   let title = html_div(container);
-  let {input: pattern_input, container: container_pattern} = ui_labelled_input(container, 'Pattern');
+  let {
+    input: pattern_input,
+    container: container_pattern
+  } = ui_labelled_input(container, 'Pattern');
   if (!memorize) {
     ui_hide(container_pattern);
-  } 
+  }
   pattern_input.addEventListener('input', function (e) {
     const value = property_value_get(property_value_get(e, 'target'), 'value');
     let characters = string_split(value, '');
@@ -104,7 +107,6 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   }
   let container_verses = ui_list(container, data, 'verses', (list_item, bible_verse, index) => {
     let book_interlinear = ui_data_value(data, 'book_interlinear');
-    console_log({ book_interlinear });
     let row = html_element(list_item, 'div');
     html_classes_add(row, ['row']);
     let left = html_element(row, 'div');
@@ -119,8 +121,9 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       link_verse_number = html_link(right);
       link_verse_number.setAttribute('role', 'button');
     } else {
-       link_verse_number = html_element(right, 'span');
+      link_verse_number = html_element(right, 'span');
     }
+    ui_spacer(right);
     const verse = property_value_get(bible_verse, 'verse');
     let index_interlinear = verse_to_index_interlinear(data, verse);
     let data_interlinear = property_value_get(book_interlinear, index_interlinear);
@@ -137,7 +140,10 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       assert(list_any(languages_keys, k => string_starts_with(number, k)), { number });
       let trimmed = string_trim_all(number, languages_keys);
       let link_strong_number = html_link(left);
-      html_classes_add(link_strong_number, ['text-decoration-none', 'fw-bold'])
+      html_classes_add(link_strong_number, [
+        'text-decoration-none',
+        'fw-bold'
+      ]);
       html_text(link_strong_number, `${ non_english }`);
       link_strong_number.setAttribute('target', '_blank');
       let first = sequence_first(number);
@@ -145,10 +151,11 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       link_strong_number.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
       let english_span = html_element(left, 'span');
       html_text(english_span, `\u00A0[${ english }] `);
-      html_classes_add(english_span, ['text-muted', 'fw-light']);
-      
+      html_classes_add(english_span, [
+        'text-muted',
+        'fw-light'
+      ]);
     });
-
     function html_table(parent, data) {
       let table = html_element(parent, 'table');
       let tbody = html_element(table, 'tbody');
@@ -161,7 +168,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       });
     }
     html_classes_add(link_verse_number, ['fw-bold']);
-    link_verse_number.textContent = verse + " ";
+    link_verse_number.textContent = verse;
     link_verse_number.dataset.is_token = false;
     if (memorize) {
       ui_action_no_message(data, link_verse_number, e => {
@@ -190,18 +197,18 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       token_previous = token_current;
     });
     let chapter = ui_data_value(data, 'chapter');
-    ui_spacer(right)
+    ui_spacer(right);
     let right_links = html_div(right);
     if (memorize) {
-      ui_hide(right_links)
+      ui_hide(right_links);
     }
     let link_parallel = html_link(right_links);
     let book = ui_data_value(data, 'book');
-    let book_without_spaces = string_replace_all(book, ' ', '_')
+    let book_without_spaces = string_replace_all(book, ' ', '_');
     let bible_hub_name = string_to_lowercase(book_without_spaces);
-    link_parallel.href = `https://biblehub.com/${bible_hub_name}/${chapter}-${verse}.htm`
-    link_parallel.target = '_blank'
-    html_text(link_parallel, 'Parallel')
+    link_parallel.href = `https://biblehub.com/${ bible_hub_name }/${ chapter }-${ verse }.htm`;
+    link_parallel.target = '_blank';
+    html_text(link_parallel, 'Parallel');
   });
   ui_data_on_changed(data, 'pattern', () => {
     ui_bible_update(data, container_verses, memorize);
@@ -224,7 +231,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     }
     if (equals(actual, 'Enter')) {
       ui_data_change(data, 'show_all_verses', boolean_not(ui_data_value(data, 'show_all_verses')));
-      ui_bible_update(data, container_verses, memorize)
+      ui_bible_update(data, container_verses, memorize);
     }
     if (!is_character(actual)) {
       return;
@@ -243,7 +250,12 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     const list_item = container_verses.childNodes[index_verse_current];
     let element_verse = ui_list_item_to_element_verse(list_item);
     const tokens = list_where(to_list(element_verse.childNodes), n => n.dataset.is_token === 'true');
-    let element_token = tokens[index_token_current];
+    console_log({
+      element_verse,
+      container_verses,
+      list_item
+    });
+    let element_token = list_get(tokens, index_token_current);
     let token = element_token.dataset.token;
     let split = string_split(token, '');
     let filtered = list_where(split, c => character_is_valid(c));
@@ -312,7 +324,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     if (value === null) {
       return;
     }
-    document.title = ui_data_value(data, 'book') + ' ' + value+  ': ' + document_title ;
+    document.title = ui_data_value(data, 'book') + ' ' + value + ': ' + document_title;
     ui_data_change(data, 'screen', screen_memorize);
     const book = ui_data_value(data, 'book');
     const chapter = ui_data_value(data, 'chapter');
@@ -328,9 +340,8 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     });
     let instructions = html_div(title);
     html_text(instructions, '(Type the first letter of the next word; Press enter to toggle viewing all the words)');
-    if (!memorize) 
-    {
-      ui_hide(instructions)
+    if (!memorize) {
+      ui_hide(instructions);
     }
     let chapter_verses = list_where(bible, b => b.book === book && b.chapter === chapter);
     let verses = list_map(chapter_verses, v => v);
@@ -342,45 +353,45 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     if (screen === screen_memorize && memorize) {
       ui_show(keyboard);
     } else {
-      ui_hide(keyboard)
+      ui_hide(keyboard);
     }
-  })
+  });
   let button_next_chapter = html_button(parent, data, 'Next Chapter', 'primary');
   ui_data_on_changed(data, 'screen', screen => {
     if (screen === screen_memorize && !memorize) {
       ui_show(button_next_chapter);
     } else {
-      ui_hide(button_next_chapter)
+      ui_hide(button_next_chapter);
     }
-  })
+  });
   ui_action_no_message(data, button_next_chapter, () => {
     next_chapter();
     window.scrollTo(0, 0);
-  })
+  });
   let keyboard = html_div(parent);
   html_classes_add(keyboard, ['fixed-bottom']);
   let rows = [
     'qwertyuiop',
     'asdfghjkl',
-    'zxcvbnm',
-  ]
+    'zxcvbnm'
+  ];
   for_each(rows, row => {
     let keyboard_row = html_element(keyboard, 'center');
     let letters_list = string_split(row, '');
     for_each(letters_list, letter => {
       let uppercase = string_to_uppercase(letter);
       let key = html_button(keyboard_row, data, uppercase, 'primary');
-      html_classes_add(key, ['btn-sm'])
+      html_classes_add(key, ['btn-sm']);
       ui_action_no_message(data, key, e => {
         press_key(letter);
       });
-    })
+    });
   });
   let window_height = window.innerHeight;
   let keyboard_height = keyboard.offsetHeight;
   if (memorize) {
-    container.style['max-height'] = window_height - keyboard_height
-    html_classes_add(container, ['overflow-auto'])
+    container.style['max-height'] = window_height - keyboard_height;
+    html_classes_add(container, ['overflow-auto']);
   }
   ui_data_on_changed(data, 'screen', value => {
     ui_hide_all(elements);
