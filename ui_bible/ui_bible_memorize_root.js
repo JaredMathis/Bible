@@ -381,7 +381,11 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     for_each(letters_list, letter => {
       let uppercase = string_to_uppercase(letter);
       let key = html_button(keyboard_row, data, uppercase, 'primary');
-      key.style.touchAction = 'manipulation';
+      html_mobile_double_tap_disable(key);
+      function html_mobile_double_tap_disable(element) {
+        arguments_assert(arguments, is_html_element);
+        element.style.touchAction = 'manipulation';
+      }
       html_classes_add(key, ['btn-sm']);
       ui_action_no_message(data, key, e => {
         press_key(letter);
