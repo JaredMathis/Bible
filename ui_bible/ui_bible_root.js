@@ -38,6 +38,10 @@ async function ui_bible_root(parent) {
       bible_id: 'asv'
     },
     {
+      label: 'Catholic Public Domain Version',
+      bible_id: 'cpdv'
+    },
+    {
       label: 'King James Version',
       bible_id: 'kjv'
     },
