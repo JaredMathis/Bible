@@ -17,5 +17,5 @@ async function bible_testaments_books(file_get) {
   for_each(testaments_books, testament_books => {
     list_add_all(result, testament_books);
   });
-  return result;
+  return result.map(r => r.trim());
 }
