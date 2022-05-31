@@ -18,5 +18,8 @@
   "homepage": "https://github.com/JaredMathis/MemorizeBible#readme",
   "dependencies": {
     "redaxios": "^0.4.1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }
