@@ -387,9 +387,12 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
         element.style.touchAction = 'manipulation';
       }
       html_classes_add(key, ['btn-sm']);
-      let size = '10vw';
+      let size = '5vw';
       key.style.fontSize = size
-      key.style.padding = '1vw';
+      key.style.paddingTop = '3vw';
+      key.style.paddingBottom = '3vw';
+      key.style.paddingLeft = '3vw';
+      key.style.paddingRight = '3vw';
       key.style.lineHeight = size;
       ui_action_no_message(data, key, e => {
         press_key(letter);
