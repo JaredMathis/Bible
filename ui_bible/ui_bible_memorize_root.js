@@ -38,7 +38,7 @@ import is_character from '../core/is_character.js';
 import string_to_lowercase from '../core/string_to_lowercase.js';
 import html_classes_add from '../ui/html_classes_add.js';
 import html_classes_remove from '../ui/html_classes_remove.js';
-import ui_labelled_input from '../ui/ui_labelled_input.js';
+import ui_labelled_select from '../ui/ui_labelled_select.js';
 import to_list from '../foundation/to_list.js';
 import size from '../foundation/size.js';
 import list_get from '../foundation/list_get.js';
@@ -75,9 +75,17 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   let container = ui_container(parent);
   let title = html_div(container);
   let {
-    input: pattern_input,
+    select: pattern_input,
     container: container_pattern
-  } = ui_labelled_input(container, 'Pattern');
+  } = ui_labelled_select(container, data, 'Pattern', [
+    '1',
+    '110',
+    '101',
+    '011',
+    '10',
+    '01',
+    '0',
+  ]);
   if (!memorize) {
     ui_hide(container_pattern);
   }
