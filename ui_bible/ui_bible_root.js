@@ -42,6 +42,10 @@ async function ui_bible_root(parent) {
       bible_id: 'cpdv'
     },
     {
+      label: 'Douay-Rheims Version, Challoner Revision',
+      bible_id: 'drv'
+    },
+    {
       label: 'King James Version',
       bible_id: 'kjv'
     },
