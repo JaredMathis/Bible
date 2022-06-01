@@ -75,7 +75,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   let container = ui_container(parent);
   let title = html_div(container);
   let {
-    select: pattern_input,
+    select: pattern_select,
     container: container_pattern
   } = ui_labelled_select(container, data, 'Pattern', [
     '1',
@@ -89,8 +89,9 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   if (!memorize) {
     ui_hide(container_pattern);
   }
-  pattern_input.addEventListener('input', function (e) {
-    const value = property_value_get(property_value_get(e, 'target'), 'value');
+  pattern_select.addEventListener('change', pattern_select_on_change);
+  function pattern_select_on_change() {
+    const value = pattern_select.value;
     let characters = string_split(value, '');
     let mapped = list_map(characters, c => {
       if (c === '1') {
@@ -102,8 +103,8 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
       error('expecting 1 or 0');
     });
     ui_data_change(data, 'pattern', mapped);
-  });
-  pattern_input.value = '1';
+  }
+  pattern_select.value = '1';
   function verse_to_index_interlinear(data, verse_index) {
     arguments_assert(arguments, is_defined, is_string_not_empty);
     let book = ui_data_value(data, 'book');
@@ -133,37 +134,40 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     }
     ui_spacer(right);
     const verse = property_value_get(bible_verse, 'verse');
-    let index_interlinear = verse_to_index_interlinear(data, verse);
-    let data_interlinear = property_value_get(book_interlinear, index_interlinear);
-    let data_interlinear_verse = property_value_get(data_interlinear, 'verse');
-    for_each(data_interlinear_verse, interlinear_word => {
-      let english = property_value_get(interlinear_word, 'text');
-      let non_english = property_value_get(interlinear_word, 'word');
-      let number = property_value_get(interlinear_word, 'number');
-      let languages = {
-        'h': 'hebrew',
-        'g': 'greek'
-      };
-      let languages_keys = keys(languages);
-      assert(list_any(languages_keys, k => string_starts_with(number, k)), { number });
-      let trimmed = string_trim_all(number, languages_keys);
-      let link_strong_number = html_link(left);
-      html_classes_add(link_strong_number, [
-        'text-decoration-none',
-        'fw-bold'
-      ]);
-      html_text(link_strong_number, `${ non_english }`);
-      link_strong_number.setAttribute('target', '_blank');
-      let first = sequence_first(number);
-      let language = property_value_get(languages, first);
-      link_strong_number.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
-      let english_span = html_element(left, 'span');
-      html_text(english_span, `\u00A0[${ english }] `);
-      html_classes_add(english_span, [
-        'text-muted',
-        'fw-light'
-      ]);
-    });
+    if (!memorize) {
+
+      let index_interlinear = verse_to_index_interlinear(data, verse);
+      let data_interlinear = property_value_get(book_interlinear, index_interlinear);
+      let data_interlinear_verse = property_value_get(data_interlinear, 'verse');
+      for_each(data_interlinear_verse, interlinear_word => {
+        let english = property_value_get(interlinear_word, 'text');
+        let non_english = property_value_get(interlinear_word, 'word');
+        let number = property_value_get(interlinear_word, 'number');
+        let languages = {
+          'h': 'hebrew',
+          'g': 'greek'
+        };
+        let languages_keys = keys(languages);
+        assert(list_any(languages_keys, k => string_starts_with(number, k)), { number });
+        let trimmed = string_trim_all(number, languages_keys);
+        let link_strong_number = html_link(left);
+        html_classes_add(link_strong_number, [
+          'text-decoration-none',
+          'fw-bold'
+        ]);
+        html_text(link_strong_number, `${ non_english }`);
+        link_strong_number.setAttribute('target', '_blank');
+        let first = sequence_first(number);
+        let language = property_value_get(languages, first);
+        link_strong_number.href = `https://biblehub.com/${ language }/${ trimmed }.htm`;
+        let english_span = html_element(left, 'span');
+        html_text(english_span, `\u00A0[${ english }] `);
+        html_classes_add(english_span, [
+          'text-muted',
+          'fw-light'
+        ]);
+      });
+    }
     function html_table(parent, data) {
       let table = html_element(parent, 'table');
       let tbody = html_element(table, 'tbody');
@@ -285,11 +289,19 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
         const index_verse_current_new = number_add_one(index_verse_current);
         ui_data_change(data, 'index_verse_current', index_verse_current_new);
         if (index_verse_current_new === size(ui_data_value(data, 'verses'))) {
-          next_chapter();
+          next_pattern();
         }
       }
     }
     ui_bible_update(data, container_verses, memorize);
+  }
+  function next_pattern() {
+    console.log('next pattern');
+    let index = pattern_select.selectedIndex;
+    let index_next = index + 1;
+    pattern_select.selectedIndex = index_next;
+    ui_data_change(data, 'index_verse_current', number_zero());
+    pattern_select_on_change();
   }
   function next_chapter() {
     console.log('next chapter');
@@ -323,10 +335,14 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     ui_data_change(data, 'screen', screen_choose_chapter);
     let books = ui_data_value(data, 'books');
     let book_index = list_index_of(books, book);
-    let interlinear_book = list_get(interlinear_books, book_index);
-    let interlinear_book_name = property_value_get(interlinear_book, 'n');
-    let book_interlinear = await ui_http_data(data, `${ bible_interlinear_url() }${ interlinear_book_name }.json`);
-    ui_data_change(data, 'book_interlinear', book_interlinear);
+    if (book_index < interlinear_books.length) {
+      let interlinear_book = list_get(interlinear_books, book_index);
+      let interlinear_book_name = property_value_get(interlinear_book, 'n');
+      let book_interlinear = await ui_http_data(data, `${ bible_interlinear_url() }${ interlinear_book_name }.json`);
+      ui_data_change(data, 'book_interlinear', book_interlinear);
+    } else {
+      console.log('TODO: fix interlinear')
+    }
   });
   ui_data_on_changed(data, 'chapter', value => {
     if (value === null) {
