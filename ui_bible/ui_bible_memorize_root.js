@@ -241,7 +241,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
     if (!memorize) {
       return;
     }
-    if (equals(actual, 'Enter')) {
+    if (equals(actual, 'Enter') || equals(actual, '*')) {
       ui_data_change(data, 'show_all_verses', boolean_not(ui_data_value(data, 'show_all_verses')));
       ui_bible_update(data, container_verses, memorize);
     }
@@ -397,7 +397,7 @@ async function ui_bible_memorize_root(parent, data, bible, mode) {
   let rows = [
     'qwertyuiop',
     'asdfghjkl',
-    'zxcvbnm'
+    'zxcvbnm*'
   ];
   for_each(rows, row => {
     let keyboard_row = html_element(keyboard, 'center');
